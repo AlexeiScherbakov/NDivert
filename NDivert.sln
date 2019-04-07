@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NDivert", "NDivert\NDivert.csproj", "{997E278B-4C68-48C7-A679-873C7CF47126}"
 EndProject
@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.NDivert", "Tests.NDivert\Tests.NDivert.csproj", "{88CE67FB-CF36-4500-8996-F15E5371B919}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NDivert.Tests", "NDivert.Tests\NDivert.Tests.csproj", "{88CE67FB-CF36-4500-8996-F15E5371B919}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,5 +29,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {096687E6-60B1-44D9-86A5-F25E9698E87F}
 	EndGlobalSection
 EndGlobal

@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using NDivert.Filter;
@@ -11,17 +12,19 @@ using NDivert.Interop;
 namespace NDivert
 {
 	/// <summary>
-	/// Drops all traffic which is matched by filter rule
+	/// Drops all traffic which is matched by filter rules
 	/// </summary>
 	public sealed class PacketDropper
 		: CriticalFinalizerObject, IDisposable
 	{
 		private bool _isStarted;
-		private List<Expression<Func<IFilter, bool>>> _dropRules;
+		private List<FilterDefinition> _dropRules;
 		private List<WinDivertHandle> _handles;
-		public PacketDropper()
+		private short _priority;
+		public PacketDropper(short priority)
 		{
-			_dropRules = new List<Expression<Func<IFilter, bool>>>();
+			_priority = priority;
+			_dropRules = new List<FilterDefinition>();
 			_handles = new List<WinDivertHandle>();
 		}
 
@@ -40,7 +43,7 @@ namespace NDivert
 			get { return _isStarted; }
 		}
 
-		public void AddRule(Expression<Func<IFilter, bool>> rule)
+		public void AddRule(FilterDefinition rule)
 		{
 			_dropRules.Add(rule);
 		}
@@ -51,17 +54,9 @@ namespace NDivert
 			{
 				return;
 			}
-			byte[] ruleBuffer = new byte[10240];
-			for (int i = 0; i < _dropRules.Count; i++)
-			{
-				DivertFilterStringBuilder.WriteFilter(ruleBuffer, _dropRules[i]);
+			var handles = Library.OpenDropHandles(_priority, _dropRules);
+			_handles.AddRange(handles);
 
-				IntPtr rawHandle = Interop.NativeMethods.WinDivertOpen(ruleBuffer, WinDivertLayer.Network, 0, WinDivertFlag.Drop);
-				//var rule=DivertFilterBuilder.MakeFilter(_dropRules[i]);
-				//IntPtr rawHandle = Interop.NativeMethods.WinDivertOpen(rule, WinDivertLayer.Network, 0, WinDivertFlag.Drop);
-				WinDivertHandle handle = rawHandle;
-				_handles.Add(handle);
-			}
 			_isStarted = true;
 		}
 

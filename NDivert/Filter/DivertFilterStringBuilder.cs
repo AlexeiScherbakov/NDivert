@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,9 +16,9 @@ namespace NDivert.Filter
 	/// </summary>
 	public class DivertFilterStringBuilder
 	{
-		private static Dictionary<MemberInfo, string> _memberStrings;
+		private static readonly Dictionary<MemberInfo, string> _memberStrings;
 
-		private static MethodInfo _ipAddrParseMethod;
+		private static readonly MethodInfo _ipAddrParseMethod;
 
 		static DivertFilterStringBuilder()
 		{
@@ -45,6 +45,7 @@ namespace NDivert.Filter
 			RegisterMember((ICommonTcpUdp x) => x.PayloadLength, "PayloadLength");
 			
 			// tcp
+			RegisterMember((ITcp x)=>x.SeqNum,"SeqNum");
 			RegisterMember((ITcp x) => x.Rst, "Rst");
 			RegisterMember((ITcp x) => x.Syn, "Syn");
 			RegisterMember((ITcp x) => x.Ack, "Ack");
@@ -91,8 +92,37 @@ namespace NDivert.Filter
 			throw new InvalidOperationException();
 		}
 
+		private static void WriteConstantExpression(TextWriter writer, ConstantExpression constExpression)
+		{
+			if (constExpression.Type == typeof(int))
+			{
+				writer.Write((int)constExpression.Value);
+			}
+			else if (constExpression.Type == typeof(IPAddress))
+			{
+				var ip = (IPAddress)constExpression.Value;
+				writer.Write(ip.ToString());
+			}
+		}
+
+		private static void WriteConstant(TextWriter writer, object obj)
+		{
+			var type = obj.GetType();
+			if (type == typeof(int))
+			{
+				writer.Write((int)obj);
+			}
+			else if (type == typeof(IPAddress))
+			{
+				var ip = (IPAddress)obj;
+				writer.Write(ip.ToString());
+			}
+		}
+
 		private static void ProcessExpression(TextWriter writer, Expression expression,bool isInternal)
 		{
+			ConstantExpression c = null;
+
 			switch (expression.NodeType)
 			{
 				case ExpressionType.And:
@@ -123,24 +153,30 @@ namespace NDivert.Filter
 					break;
 				case ExpressionType.MemberAccess:
 					MemberExpression m = (MemberExpression)expression;
-					if (m.Expression.NodeType != ExpressionType.Parameter)
+					switch (m.Expression.NodeType)
 					{
-						ProcessExpression(writer, m.Expression, true);
-						writer.Write('.');
+						case ExpressionType.Constant:
+							c = (ConstantExpression)m.Expression;
+							var type = c.Type;
+							var fields = type.GetFields();
+							var field = fields[0];
+							var obj=field.GetValue(c.Value);
+							WriteConstant(writer,obj);
+							break;
+						default:
+							if (m.Expression.NodeType != ExpressionType.Parameter)
+							{
+								ProcessExpression(writer, m.Expression, true);
+								writer.Write('.');
+							}
+							writer.Write(_memberStrings[m.Member]);
+							break;
 					}
-					writer.Write(_memberStrings[m.Member]);
+					
 					break;
 				case ExpressionType.Constant:
-					ConstantExpression c = (ConstantExpression)expression;
-					if (c.Type == typeof(int))
-					{
-						writer.Write((int)c.Value);
-					}
-					else if (c.Type == typeof(IPAddress))
-					{
-						var ip = (IPAddress)c.Value;
-						writer.Write(ip.ToString());
-					}
+					c = (ConstantExpression)expression;
+					WriteConstantExpression(writer, c);
 					break;
 				case ExpressionType.Call:
 					MethodCallExpression call = (MethodCallExpression)expression;
@@ -178,15 +214,12 @@ namespace NDivert.Filter
 			MemoryStream m = new MemoryStream(array, true);
 			LambdaExpression lambda = expression;
 			Expression body = lambda.Body;
-			using (var writer = new StreamWriter(m, Encoding.ASCII))
+			using (var writer = new StreamWriter(m, Encoding.ASCII, 1024))
 			{
 				ProcessExpression(writer, body, false);
+				writer.Flush();
+				m.WriteByte(0);
 			}
-
-			m.WriteByte(0);
-			m.WriteByte(0);
-			m.WriteByte(0);
-			m.WriteByte(0);
 		}
 	}
 }

@@ -1,16 +1,17 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using NDivert.Filter;
 using NUnit.Framework;
 
-namespace Tests.NDivert
+namespace NDivert.Tests
 {
 	[TestFixture]
-    public class FilterStringBuilderTest
-    {
+	public class FilterStringBuilderTest
+	{
 		[Test]
 		public void SimpleFiltersTest()
 		{
@@ -30,5 +31,15 @@ namespace Tests.NDivert
 			Assert.AreEqual("inbound and (((tcp.SrcPort == 80) or (tcp.SrcPort == 443)) or (tcp.SrcPort == 81))",
 				DivertFilterStringBuilder.MakeFilter(x => x.Inbound && ((x.Tcp.SrcPort == 80) || x.Tcp.SrcPort == 443 || x.Tcp.SrcPort == 81)));
 		}
-    }
+
+
+		[Test]
+		public void FiltersWithConstantsTest()
+		{
+			IPAddress ip = IPAddress.Parse("8.8.8.8");
+
+			Assert.AreEqual("(inbound and (ip.SrcAddr == 8.8.8.8)) or (outbound and (ip.DstAddr == 8.8.8.8))", DivertFilterStringBuilder.MakeFilter(x => (x.Inbound && (x.Ip.SrcAddr == IPAddress.Parse("8.8.8.8"))) || (x.Outbound && (x.Ip.DstAddr == IPAddress.Parse("8.8.8.8")))));
+			Assert.AreEqual("(inbound and (ip.SrcAddr == 8.8.8.8)) or (outbound and (ip.DstAddr == 8.8.8.8))", DivertFilterStringBuilder.MakeFilter(x => (x.Inbound && (x.Ip.SrcAddr == ip)) || (x.Outbound && (x.Ip.DstAddr == ip))));
+		}
+	}
 }

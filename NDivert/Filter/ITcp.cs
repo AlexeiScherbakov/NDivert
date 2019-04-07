@@ -12,7 +12,7 @@ namespace NDivert.Filter
 	public interface ITcp
 		:ICommonTcpUdp
 	{
-		
+		int SeqNum { get; }
 		bool Syn { get; }
 		bool Rst { get; }
 		bool Ack { get; }

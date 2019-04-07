@@ -1,40 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System;
+
+using Microsoft.Win32.SafeHandles;
 
 namespace NDivert.Interop
 {
-
-	internal sealed class WinDivertHandle
-		: SafeHandle
+	/// <summary>
+	/// Driver handle
+	/// </summary>
+	public abstract class WinDivertHandle
+		: SafeHandleZeroOrMinusOneIsInvalid
 	{
-		private static IntPtr InvalidHandle = new IntPtr(-1);
-
-
-		public static implicit operator WinDivertHandle(IntPtr handle)
-		{
-			return new WinDivertHandle(handle);
-		}
-
-		public WinDivertHandle(IntPtr handle)
-			: base(InvalidHandle, true)
+		internal WinDivertHandle(IntPtr handle)
+			: base(true)
 		{
 			SetHandle(handle);
 		}
 
-		public override bool IsInvalid
+		public bool CancelIo()
 		{
-			get { return handle == InvalidHandle; }
+			return NativeMethods.Kernel32.CancelIoEx(handle, IntPtr.Zero);
 		}
 
-		protected override bool ReleaseHandle()
-		{
-			var h = Interlocked.Exchange(ref handle, IntPtr.Zero);
-			return NativeMethods.WinDivertClose(h);
-		}
+		public abstract bool Send(byte[] packet, int packetLength, in WinDivertAddress address, out int bytesSend);
+		public abstract bool Receive(byte[] packet, int packetLength, out WinDivertAddress address, out int bytesReceived);
 	}
+
 }

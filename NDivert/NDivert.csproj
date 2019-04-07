@@ -1,20 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFrameworks>net40;net45;net461;net47</TargetFrameworks>
-    <Authors>Alexei Shcherbakov</Authors>
-    <Company />
-    <Product>NDivert</Product>
-    <Description>.NET library for WinDivert driver</Description>
-    <PackageTags>divert, wfp, firewall</PackageTags>
-    <Copyright>Copyright © Alexei Shcherbakov 2017</Copyright>
-    <PackageProjectUrl>https://github.com/AlexeiScherbakov/NDivert</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/AlexeiScherbakov/NDivert/blob/master/LICENSE</PackageLicenseUrl>
-    <RepositoryUrl>https://github.com/AlexeiScherbakov/NDivert</RepositoryUrl>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-    <DelaySign>False</DelaySign>
-  </PropertyGroup>
-
+	<PropertyGroup>
+		<TargetFrameworks>net461;net47;netstandard2.0;netcoreapp2.1</TargetFrameworks>
+		<Authors>Alexei Shcherbakov</Authors>
+		<Company />
+		<Product>NDivert</Product>
+		<Description>.NET library for WinDivert driver</Description>
+		<PackageTags>divert, wfp, firewall</PackageTags>
+		<Copyright>Copyright © Alexei Shcherbakov 2017</Copyright>
+		<PackageProjectUrl>https://github.com/AlexeiScherbakov/NDivert</PackageProjectUrl>
+		<PackageLicense>https://github.com/AlexeiScherbakov/NDivert/blob/master/LICENSE</PackageLicense>
+		<RepositoryUrl>https://github.com/AlexeiScherbakov/NDivert</RepositoryUrl>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+		<DelaySign>False</DelaySign>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>7.2</LangVersion>
+		<Version>1.4.1.1</Version>
+	</PropertyGroup>
+	<ItemGroup Condition=" ('$(TargetFramework)' == 'netstandard2.0') or ('$(TargetFramework)' == 'netcoreapp2.1')">
+	  <PackageReference Include="System.Security.Principal.Windows" Version="4.5.1" />
+	</ItemGroup>
 </Project>
