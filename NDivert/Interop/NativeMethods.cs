@@ -28,21 +28,37 @@ namespace NDivert.Interop
 			[DllImport(WinDivertDll, EntryPoint = "WinDivertOpen", CallingConvention = CallingConvention.Cdecl)]
 			public static extern IntPtr WinDivertOpen(byte[] rule, WinDivertLayer layer, short priority, WinDivertFlag flags);
 
+			[DllImport(WinDivertDll, EntryPoint = "WinDivertRecv", CallingConvention = CallingConvention.Cdecl)]
+			[return: MarshalAs(UnmanagedType.Bool)]
+			public static extern bool WinDivertRecv(IntPtr handle, byte[] pPacket, int packetLen, out int readLen, out WinDivertAddress addr );
+
+			[DllImport(WinDivertDll, EntryPoint = "WinDivertRecvEx", CallingConvention = CallingConvention.Cdecl)]
+			[return: MarshalAs(UnmanagedType.Bool)]
+			public static extern bool WinDivertRecvEx(IntPtr handle, byte[] pPacket, int packetLen, out int readLen, long flags, out WinDivertAddress addr, ref int addrLen, ref System.Threading.NativeOverlapped overlapped);
+
+			[DllImport(WinDivertDll, EntryPoint = "WinDivertSend", CallingConvention = CallingConvention.Cdecl)]
+			[return: MarshalAs(UnmanagedType.Bool)]
+			public static extern bool WinDivertSend(IntPtr handle, byte[] pPacket, int packetLen, out int sendLen, in WinDivertAddress addr);
+
+			[DllImport(WinDivertDll, EntryPoint = "WinDivertSendEx", CallingConvention = CallingConvention.Cdecl)]
+			[return: MarshalAs(UnmanagedType.Bool)]
+			public static extern bool WinDivertSendEx(IntPtr handle, byte[] pPacket, int packetLen, out int sendLen, in WinDivertAddress addr,int addrLen, ref System.Threading.NativeOverlapped overlapped);
+
+			[DllImport(WinDivertDll, EntryPoint = "WinDivertShutdown", CallingConvention = CallingConvention.Cdecl)]
+			[return: MarshalAs(UnmanagedType.Bool)]
+			public static extern bool WinDivertShutdown(IntPtr handle, WinDivertShutdown how);
+
 			[DllImport(WinDivertDll, EntryPoint = "WinDivertClose", CallingConvention = CallingConvention.Cdecl)]
 			[return: MarshalAs(UnmanagedType.Bool)]
 			public static extern bool WinDivertClose(IntPtr handle);
 
-			[DllImport(WinDivertDll, EntryPoint = "WinDivertRecv", CallingConvention = CallingConvention.Cdecl)]
+			[DllImport(WinDivertDll, EntryPoint = "WinDivertSetParam", CallingConvention = CallingConvention.Cdecl)]
 			[return: MarshalAs(UnmanagedType.Bool)]
-			public static extern bool WinDivertRecv(IntPtr handle, byte[] pPacket, int packetLen, out WinDivertAddress addr, out int readLen);
+			public static extern bool WinDivertSetParam(IntPtr handle, WinDivertParam param, ulong value);
 
-			[DllImport(WinDivertDll, EntryPoint = "WinDivertRecvEx", CallingConvention = CallingConvention.Cdecl)]
+			[DllImport(WinDivertDll, EntryPoint = "WinDivertGetParam", CallingConvention = CallingConvention.Cdecl)]
 			[return: MarshalAs(UnmanagedType.Bool)]
-			public static extern bool WinDivertRecvEx(IntPtr handle, byte[] pPacket, int packetLen, long flags, out WinDivertAddress addr, out int readLen, ref System.Threading.NativeOverlapped overlapped);
-
-			[DllImport(WinDivertDll, EntryPoint = "WinDivertSend", CallingConvention = CallingConvention.Cdecl)]
-			[return: MarshalAs(UnmanagedType.Bool)]
-			public static extern bool WinDivertSend(IntPtr handle, byte[] pPacket, int packetLen, in WinDivertAddress addr, out int writelen);
+			public static extern bool WinDivertGetParam(IntPtr handle, WinDivertParam param, out ulong value);
 		}
 	}
 }

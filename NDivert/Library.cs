@@ -75,6 +75,10 @@ namespace NDivert
 								throw new ArgumentException("filter expression is invalid", nameof(filter));
 							case 577:
 								throw new UnauthorizedAccessException("Driver signature verification failed");
+							case 654:
+								throw new InvalidOperationException("An incompatible version of the WinDivert driver is currently loaded");
+							case 1060:
+								throw new InvalidOperationException("The handle was opened with the WINDIVERT_FLAG_NO_INSTALL flag and the WinDivert driver is not already installed.");
 							case 1275:
 								throw new UnauthorizedAccessException("Driver is blocked by other software");
 							case 1753:

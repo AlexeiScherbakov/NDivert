@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -13,10 +13,13 @@ namespace NDivert
 		/// <summary>
 		/// Network layer
 		/// </summary>
-		Network=0,
+		Network = 0,
 		/// <summary>
 		/// Network layer (forwarded packets)
 		/// </summary>
-		NetworkForward=1
+		NetworkForward = 1,
+		Flow = 2,
+		Socket = 3,
+		Reflect = 4
 	}
 }
